@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+        background: #f7f7fb;
+      }
+
+      main {
+        display: grid;
+        justify-items: center;
+        gap: 2rem;
+        padding: 2rem;
+      }
+
+      #hello {
+        margin: 0;
+        color: #5b4bdb;
+        font-size: clamp(4rem, 18vw, 12rem);
+        font-weight: 800;
+        letter-spacing: -0.08em;
+        line-height: 0.9;
+        transition: color 250ms ease;
+      }
+
+      button {
+        padding: 0.8rem 1.25rem;
+        border: 0;
+        border-radius: 999px;
+        background: #171725;
+        color: #ffffff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        transition: transform 150ms ease, background 150ms ease;
+      }
+
+      button:hover {
+        background: #303044;
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:focus-visible {
+        outline: 3px solid #5b4bdb;
+        outline-offset: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="hello">Hello</h1>
+      <button type="button" id="color-button">Change color</button>
+    </main>
+
+    <script>
+      const hello = document.querySelector("#hello");
+      const colorButton = document.querySelector("#color-button");
+
+      colorButton.addEventListener("click", () => {
+        const hue = Math.floor(Math.random() * 360);
+        hello.style.color = `hsl(${hue} 70% 45%)`;
+      });
+    </script>
+  </body>
+</html>
