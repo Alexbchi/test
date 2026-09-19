@@ -15,18 +15,36 @@
       }
 
       body {
-        display: grid;
         min-height: 100vh;
         margin: 0;
-        place-items: center;
         background: #f7f7fb;
       }
 
       main {
         display: grid;
+        min-height: 100vh;
+        align-content: center;
         justify-items: center;
         gap: 2rem;
         padding: 2rem;
+      }
+
+      .google-search-form {
+        display: grid;
+        gap: 0.5rem;
+        width: min(100%, 42rem);
+      }
+
+      .google-search-form label {
+        color: #303044;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      .google-search-controls {
+        display: flex;
+        gap: 0.65rem;
+        width: 100%;
       }
 
       #hello {
@@ -144,6 +162,21 @@
   </head>
   <body>
     <main>
+      <form class="google-search-form" action="https://www.google.com/search" method="get">
+        <label for="google-query">Rechercher sur Google</label>
+        <div class="google-search-controls">
+          <input
+            id="google-query"
+            name="q"
+            type="search"
+            placeholder="Écrivez votre recherche"
+            autocomplete="off"
+            required
+          />
+          <input name="btnI" type="hidden" value="1" />
+          <button type="submit">Recherche</button>
+        </div>
+      </form>
       <h1 id="hello">Hello</h1>
       <div class="button-group">
         <button type="button" id="color-button">Change color</button>
