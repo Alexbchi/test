@@ -39,6 +39,13 @@
         transition: color 250ms ease;
       }
 
+      .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
       button {
         padding: 0.8rem 1.25rem;
         border: 0;
@@ -69,16 +76,37 @@
   <body>
     <main>
       <h1 id="hello">Hello</h1>
-      <button type="button" id="color-button">Change color</button>
+      <div class="button-group">
+        <button type="button" id="color-button">Change color</button>
+        <button type="button" id="name-button">Create name</button>
+      </div>
     </main>
 
     <script>
       const hello = document.querySelector("#hello");
       const colorButton = document.querySelector("#color-button");
+      const nameButton = document.querySelector("#name-button");
+      const names = [
+        "Alex",
+        "Camille",
+        "Charlie",
+        "Emma",
+        "Hugo",
+        "Jade",
+        "Léa",
+        "Louis",
+        "Mila",
+        "Noah",
+      ];
 
       colorButton.addEventListener("click", () => {
         const hue = Math.floor(Math.random() * 360);
         hello.style.color = `hsl(${hue} 70% 45%)`;
+      });
+
+      nameButton.addEventListener("click", () => {
+        const name = names[Math.floor(Math.random() * names.length)];
+        hello.textContent = `Hello ${name}`;
       });
     </script>
   </body>
