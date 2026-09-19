@@ -145,6 +145,24 @@
         }
       }
 
+      async function readChatGptResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+        const body = await response.text();
+
+        if (!contentType.includes("application/json")) {
+          if (body.trimStart().startsWith("<")) {
+            throw new Error("Le serveur de l’application a renvoyé une page web au lieu de l’API. Démarrez l’application avec npm start et ouvrez l’adresse indiquée dans le terminal.");
+          }
+          throw new Error("Le serveur a renvoyé une réponse invalide. Réessayez dans un instant.");
+        }
+
+        try {
+          return JSON.parse(body);
+        } catch {
+          throw new Error("Le serveur a renvoyé une réponse JSON invalide. Réessayez dans un instant.");
+        }
+      }
+
       searchForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const question = questionInput.value.trim();
@@ -161,8 +179,11 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ question }),
           });
-          const data = await response.json();
+          const data = await readChatGptResponse(response);
           if (!response.ok) throw new Error(data.error || "La réponse est indisponible.");
+          if (typeof data.answer !== "string" || !data.answer.trim()) {
+            throw new Error("Le serveur n’a pas fourni de réponse exploitable. Réessayez dans un instant.");
+          }
 
           const createdAt = new Date().toISOString();
           addAnswer(question, data.answer, createdAt);
