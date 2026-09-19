@@ -1,0 +1,8 @@
+{
+  "name": "chatgpt-search-history",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
