@@ -46,6 +46,42 @@
         gap: 0.75rem;
       }
 
+      .city-form {
+        display: grid;
+        gap: 0.5rem;
+        justify-items: start;
+        width: min(100%, 28rem);
+      }
+
+      .city-form label {
+        color: #303044;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      .city-controls {
+        display: flex;
+        gap: 0.65rem;
+        width: 100%;
+      }
+
+      input {
+        min-width: 0;
+        flex: 1;
+        padding: 0.8rem 1rem;
+        border: 2px solid #d9d9e8;
+        border-radius: 0.6rem;
+        background: #ffffff;
+        color: #171725;
+        font: inherit;
+      }
+
+      input:focus {
+        border-color: #5b4bdb;
+        outline: 3px solid rgb(91 75 219 / 20%);
+        outline-offset: 1px;
+      }
+
       button {
         padding: 0.8rem 1.25rem;
         border: 0;
@@ -67,9 +103,42 @@
         transform: translateY(0);
       }
 
+      button:disabled {
+        cursor: wait;
+        opacity: 0.7;
+        transform: none;
+      }
+
       button:focus-visible {
         outline: 3px solid #5b4bdb;
         outline-offset: 4px;
+      }
+
+      dialog {
+        width: min(calc(100% - 2rem), 31rem);
+        border: 0;
+        border-radius: 1rem;
+        box-shadow: 0 1.5rem 4rem rgb(23 23 37 / 30%);
+        color: #171725;
+        padding: 1.5rem;
+      }
+
+      dialog::backdrop {
+        background: rgb(23 23 37 / 50%);
+      }
+
+      .dialog-content {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .dialog-content h2,
+      .dialog-content p {
+        margin: 0;
+      }
+
+      .dialog-content form {
+        justify-self: end;
       }
     </style>
   </head>
@@ -80,12 +149,34 @@
         <button type="button" id="color-button">Change color</button>
         <button type="button" id="name-button">Create name</button>
       </div>
+      <form class="city-form" id="city-form">
+        <div class="city-controls">
+          <input id="city" name="city" type="text" autocomplete="address-level2" required />
+          <button type="submit">OK</button>
+        </div>
+        <label for="city">Write a city</label>
+      </form>
     </main>
+
+    <dialog id="birth-dialog" aria-labelledby="birth-dialog-title">
+      <div class="dialog-content">
+        <h2 id="birth-dialog-title">Birth count</h2>
+        <p id="birth-result"></p>
+        <form method="dialog">
+          <button type="submit">Close</button>
+        </form>
+      </div>
+    </dialog>
 
     <script>
       const hello = document.querySelector("#hello");
       const colorButton = document.querySelector("#color-button");
       const nameButton = document.querySelector("#name-button");
+      const cityForm = document.querySelector("#city-form");
+      const cityInput = document.querySelector("#city");
+      const birthDialog = document.querySelector("#birth-dialog");
+      const birthResult = document.querySelector("#birth-result");
+      let selectedName = "";
       const names = [
         "Alex",
         "Camille",
@@ -106,7 +197,62 @@
 
       nameButton.addEventListener("click", () => {
         const name = names[Math.floor(Math.random() * names.length)];
+        selectedName = name;
         hello.textContent = `Hello ${name}`;
+      });
+
+      async function findCity(city) {
+        const response = await fetch(
+          `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(city)}&fields=nom&limit=1`,
+        );
+
+        if (!response.ok) {
+          throw new Error("The city service could not be reached.");
+        }
+
+        const [match] = await response.json();
+        return match?.nom;
+      }
+
+      function showBirthResult(message) {
+        birthResult.textContent = message;
+        birthDialog.showModal();
+      }
+
+      cityForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!selectedName) {
+          showBirthResult("Choose a name with Create name before looking up births.");
+          return;
+        }
+
+        const city = cityInput.value.trim();
+        const submitButton = cityForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = "Searching…";
+
+        try {
+          const matchedCity = await findCity(city);
+
+          if (!matchedCity) {
+            showBirthResult(`No French city matching “${city}” was found.`);
+            return;
+          }
+
+          // French first-name birth counts are published with a delay. There is
+          // no official city-level dataset for 2026 yet, so do not invent a count.
+          showBirthResult(
+            `The 2026 birth count for ${selectedName} in ${matchedCity} is not published yet.`,
+          );
+        } catch {
+          showBirthResult(
+            "The city could not be checked online. Please verify your connection and try again.",
+          );
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "OK";
+        }
       });
     </script>
   </body>
