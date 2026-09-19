@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recherche ChatGPT</title>
+    <!--
+      Pour utiliser cette page depuis un hébergement statique, indiquez ici
+      l'URL HTTPS de votre API déployée (sans y mettre de clé OpenAI).
+      L'URL peut aussi être fournie ponctuellement avec ?api=https://…
+    -->
+    <meta name="chatgpt-api-endpoint" content="" />
     <style>
       :root {
         color-scheme: light;
@@ -114,7 +120,18 @@
       const answerList = document.querySelector("#answer-list");
       const emptyState = document.querySelector("#empty-state");
       const historyStorageKey = "chatgpt-search-history";
+      const configuredApiEndpoint = new URLSearchParams(window.location.search).get("api")
+        || document.querySelector('meta[name="chatgpt-api-endpoint"]')?.content.trim()
+        || "/api/chatgpt";
       let searchHistory = [];
+
+      function getApiEndpoint() {
+        try {
+          return new URL(configuredApiEndpoint, window.location.href).toString();
+        } catch {
+          throw new Error("L’adresse de l’API configurée est invalide.");
+        }
+      }
 
       try {
         const savedHistory = JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
@@ -151,7 +168,7 @@
 
         if (!contentType.includes("application/json")) {
           if (body.trimStart().startsWith("<")) {
-            throw new Error("Le serveur de l’application a renvoyé une page web au lieu de l’API. Démarrez l’application avec npm start et ouvrez l’adresse indiquée dans le terminal.");
+            throw new Error("L’adresse de l’API a renvoyé une page web au lieu de JSON. Déployez l’API /api/chatgpt, puis renseignez son URL dans la balise meta « chatgpt-api-endpoint » ou avec le paramètre ?api=.");
           }
           throw new Error("Le serveur a renvoyé une réponse invalide. Réessayez dans un instant.");
         }
@@ -174,7 +191,7 @@
         status.textContent = "ChatGPT analyse votre question…";
 
         try {
-          const response = await fetch("/api/chatgpt", {
+          const response = await fetch(getApiEndpoint(), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ question }),

@@ -2,16 +2,23 @@
 
 Cette application transforme une question en une synthèse produite par ChatGPT et conserve les réponses dans un historique, avec les plus récentes en premier.
 
-## Démarrer l’application
+## Utiliser la page avec une API
 
 1. Utilisez Node.js 18 ou une version plus récente.
 2. Créez une clé dans votre compte sur la plateforme API OpenAI, puis définissez-la côté serveur : `export OPENAI_API_KEY="votre-cle"`.
 3. (Facultatif) Choisissez le modèle : `export OPENAI_MODEL="gpt-4.1-mini"`.
-4. Lancez `npm start`, puis ouvrez `http://localhost:3000`.
+4. Déployez `server.js` (ou son équivalent serverless) sur un environnement qui exécute Node.js et configurez-y les variables ci-dessus.
+5. Dans `index.html`, renseignez l’URL HTTPS de l’endpoint déployé dans la balise suivante :
+
+   ```html
+   <meta name="chatgpt-api-endpoint" content="https://api.example.com/api/chatgpt" />
+   ```
+
+   Pour un essai ponctuel, vous pouvez aussi ouvrir la page avec `?api=https://api.example.com/api/chatgpt`. Cette option permet d’utiliser la page HTML depuis un hébergement statique, sans lancer `npm start` sur votre ordinateur.
 
 La clé API reste côté serveur : le navigateur envoie uniquement la question à `/api/chatgpt`. Ne placez jamais cette clé dans `index.html`, une variable `PUBLIC_*`, ou le code JavaScript livré au navigateur.
 
-> N’ouvrez pas `index.html` directement et ne déployez pas seulement ce fichier sur un hébergeur statique : la recherche nécessite le serveur Node.js, qui expose `/api/chatgpt`. Si cette URL renvoie une page HTML, l’interface affiche une explication au lieu de l’erreur technique « Unexpected token '<' ». L’application envoie aussi systématiquement une réponse JSON pour les routes `/api/*`, y compris lors d’une erreur amont.
+> Une page HTML ne peut pas elle-même exécuter une API ou conserver une clé OpenAI secrète. Elle peut en revanche appeler une API déjà déployée. Si l’URL de l’API renvoie une page HTML, l’interface indique comment renseigner l’endpoint, au lieu d’afficher l’erreur technique « Unexpected token '<' ». L’application Node envoie systématiquement du JSON pour les routes `/api/*`, y compris lors d’une erreur amont.
 
 ## API et coût
 

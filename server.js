@@ -16,6 +16,14 @@ function sendJson(response, statusCode, body) {
   response.end(JSON.stringify(body));
 }
 
+function setApiCorsHeaders(response) {
+  // The static page may be hosted separately from this small API service.
+  // No credentials are accepted by this endpoint; the OpenAI key stays server-side.
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
 async function readJsonBody(request) {
   let body = "";
   for await (const chunk of request) {
@@ -115,6 +123,13 @@ export function createApp({
     const requestUrl = new URL(request.url, `http://${request.headers.host || "localhost"}`);
 
     if (requestUrl.pathname === "/api/chatgpt") {
+      setApiCorsHeaders(response);
+      if (request.method === "OPTIONS") {
+        response.writeHead(204);
+        response.end();
+        return;
+      }
+
       if (request.method !== "POST") {
         sendJson(response, 405, { error: "Utilisez POST pour appeler cette API." });
         return;
