@@ -49,6 +49,23 @@ test("invalid client JSON produces a JSON validation error", async () => {
   });
 });
 
+test("the chat endpoint accepts cross-origin requests from a static page", async () => {
+  await withServer({}, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/chatgpt`, {
+      method: "OPTIONS",
+      headers: {
+        Origin: "https://site-statique.example",
+        "Access-Control-Request-Method": "POST",
+      },
+    });
+
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get("access-control-allow-origin"), "*");
+    assert.match(response.headers.get("access-control-allow-methods"), /POST/);
+    assert.match(response.headers.get("access-control-allow-headers"), /Content-Type/);
+  });
+});
+
 test("a missing API key is reported without exposing a browser-side key", async () => {
   await withServer({ apiKey: "" }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/chatgpt`, {
