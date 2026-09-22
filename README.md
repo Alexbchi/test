@@ -7,14 +7,14 @@ Cette application transforme une question en une synthèse produite par ChatGPT 
 1. Utilisez Node.js 18 ou une version plus récente.
 2. Créez une clé dans votre compte sur la plateforme API OpenAI, puis définissez-la côté serveur : `export OPENAI_API_KEY="votre-cle"`.
 3. (Facultatif) Choisissez le modèle : `export OPENAI_MODEL="gpt-4.1-mini"`.
-4. Déployez `server.js` (ou son équivalent serverless) sur un environnement qui exécute Node.js et configurez-y les variables ci-dessus.
-5. Dans `index.html`, renseignez l’URL HTTPS de l’endpoint déployé dans la balise suivante :
+4. Déployez ce dépôt sur Vercel (le fichier `api/chatgpt.js` est automatiquement publié à l’adresse `/api/chatgpt`) et configurez-y les variables ci-dessus.
+5. L’URL de l’API est déjà renseignée dans `index.html` et pointe vers le même domaine que la page :
 
    ```html
-   <meta name="chatgpt-api-endpoint" content="https://api.example.com/api/chatgpt" />
+   <meta name="chatgpt-api-endpoint" content="/api/chatgpt" />
    ```
 
-   Pour un essai ponctuel, vous pouvez aussi ouvrir la page avec `?api=https://api.example.com/api/chatgpt`. Cette option permet d’utiliser la page HTML depuis un hébergement statique, sans lancer `npm start` sur votre ordinateur.
+   Après le déploiement, l’endpoint complet est donc `https://votre-projet.vercel.app/api/chatgpt`. Pour utiliser une API hébergée sur un autre domaine, remplacez cette valeur par son URL HTTPS complète. Vous pouvez aussi la remplacer ponctuellement avec `?api=https://api.example.com/api/chatgpt`.
 
 La clé API reste côté serveur : le navigateur envoie uniquement la question à `/api/chatgpt`. Ne placez jamais cette clé dans `index.html`, une variable `PUBLIC_*`, ou le code JavaScript livré au navigateur.
 

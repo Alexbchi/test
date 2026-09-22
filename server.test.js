@@ -80,3 +80,10 @@ test("a missing API key is reported without exposing a browser-side key", async 
     });
   });
 });
+
+test("the page is configured to call its deployed same-origin API", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const page = await readFile(new URL("./index.html", import.meta.url), "utf8");
+
+  assert.match(page, /<meta name="chatgpt-api-endpoint" content="\/api\/chatgpt" \/>/);
+});
